@@ -26,6 +26,7 @@
 import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
 
+# -------------------------------------------- #
 # 🌟 Step1 modelの構築 方法
 
 # 🌟🌟 モデルの定義1(後からaddしていく方法)
@@ -57,7 +58,8 @@ model = Sequential([
     Dense(1, activation='sigmoid')
 ])
 
-# 🌟 コンパイル(だいたいこんな感じ)
+# -------------------------------------------- #
+# 🌟 Step2　コンパイル(だいたいこんな感じ)
 # 作成したモデルはこのままでもpredictはできるが、fittingしてトレーニングをする必要がある。
 model.compile(
     # 最適化関数
@@ -67,7 +69,8 @@ model.compile(
     # watchするパラメータ
     metrics=['accuracy'])
 
-# 🌟 fitting
+# -------------------------------------------- #
+# 🌟 Step3 fitting
 # ポイントとしては、バッチサイズ、epoch数、
 # training dataとvalidation data　を使うかといった観点を考える必要がある。
 
@@ -83,13 +86,20 @@ history = model.fit_generator(
     validation_steps=total_val // batch_size
 )
 
-# 🌟モデルを動かして結果を得る
+# -------------------------------------------- #
+# Step4 🌟モデルを動かして結果を得る
+
+# モデルの評価をしてくれる関数 戻り値からmetricを取得できる。
+test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 
 # まぁ、こんな感じ　 input_shape = (x,y,z)に対して入力するデータ数をnとすると、
 # (n, x, y, z)が入力となるように整える。
+# 分類の場合、各クラスの確率となるのでindexの最大値を取る
 num = 10
 res = model.predict(test_images[:num])
 
+for i in range(len(res)):
+    print(res[i].argmax() , " == " , test_labels[i]," : ",res[i].argmax() == test_labels[i])
 ```
 
 ## <a name="2">tutorial2</a>
