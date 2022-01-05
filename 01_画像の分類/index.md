@@ -2,12 +2,17 @@
 
 - [tutorial1](#1)
 
-  - [ ] Conv2D とプーリング層で畳み込みニューラル ネットワークを定義する。
-  - [ ] リアルワールド画像のデータセットを処理するモデルを構築して訓練する。
-  - [ ] 畳み込みを使用してニューラル ネットワークを改善する方法について理解している。
-  - [ ] さまざまな形状やサイズのリアルワールド画像を使用する。
+  - [x] Conv2D とプーリング層で畳み込みニューラル ネットワークを定義する。
+  - [x] リアルワールド画像のデータセットを処理するモデルを構築して訓練する。
+  - [x] 畳み込みを使用してニューラル ネットワークを改善する方法について理解している。
+    - おそらくデータの`拡張`、`dropout`などの`under fitting`, `over fitting` の対策についての問題
+      - [00\_モデルの構築と訓練](../00_モデルの構築と訓練)にまとめる。
 
 - [tutorial2](#2)
+
+  - [ ] さまざまな形状やサイズのリアルワールド画像を使用する。
+
+    - [ ] 画素数、channel 数の違うデータの扱いのこと？
 
   - [ ] 画像の拡張を使用して過剰適合を回避する。
   - [ ] ImageDataGenerator を使用する。
@@ -15,7 +20,52 @@
 
 ## <a name="1">tutorial1</a>
 
+### model の構築からコンパイルまで
+
 ```python
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+
+# 🌟 Step1 modelの構築 方法
+
+# 🌟🌟 モデルの定義1(後からaddしていく方法)
+model = models.Sequential()
+
+# Convレイヤー
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+
+# Poolingレイヤー
+model.add(layers.Flatten())
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(10, activation='softmax'))
+
+# --------------------------- #
+# 🌟🌟 モデルの定義2(一括で定義する方法)
+model = Sequential([
+    Conv2D(16, 3, padding='same', activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH ,3)),
+    MaxPooling2D(),
+    Conv2D(32, 3, padding='same', activation='relu'),
+    MaxPooling2D(),
+    Conv2D(64, 3, padding='same', activation='relu'),
+    MaxPooling2D(),
+    Flatten(),
+    Dense(512, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+
+# 🌟 コンパイル(だいたいこんな感じ)
+# 作成したモデルはこのままでもpredictはできるが、fittingしてトレーニングをする必要がある。
+model.compile(
+    # 最適化関数
+    optimizer='adam',
+    # 損失関数
+    loss='sparse_categorical_crossentropy',
+    # watchするパラメータ
+    metrics=['accuracy'])
 
 ```
 
