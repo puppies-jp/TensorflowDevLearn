@@ -67,6 +67,29 @@ model.compile(
     # watchするパラメータ
     metrics=['accuracy'])
 
+# 🌟 fitting
+# ポイントとしては、バッチサイズ、epoch数、
+# training dataとvalidation data　を使うかといった観点を考える必要がある。
+
+# これ
+model.fit(train_images, train_labels, epochs=5)
+
+# または こんな感じ
+history = model.fit_generator(
+    train_data_gen,
+    steps_per_epoch=total_train // batch_size,
+    epochs=epochs,
+    validation_data=val_data_gen,
+    validation_steps=total_val // batch_size
+)
+
+# 🌟モデルを動かして結果を得る
+
+# まぁ、こんな感じ　 input_shape = (x,y,z)に対して入力するデータ数をnとすると、
+# (n, x, y, z)が入力となるように整える。
+num = 10
+res = model.predict(test_images[:num])
+
 ```
 
 ## <a name="2">tutorial2</a>
