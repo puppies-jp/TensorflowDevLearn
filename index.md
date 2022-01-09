@@ -12,7 +12,8 @@
   - [ ] TensorFlow API のエラー メッセージをデバッグし、調査し、解決する方法について理解している。
         必要に応じて tensorflow.org 以外でも情報を検索して TensorFlow に関する疑問を解決する方法について理解している。
   - [ ] 解決しようとしている問題に見合ったモデルサイズの ML モデルを、TensorFlow を使用して作成する方法について理解している。
-  - [ ] ML モデルを保存してモデルのファイルサイズを確認する方法について理解している。
+  - [x] [ML モデルを保存してモデルのファイルサイズを確認する方法について理解している。](#save_load)
+    - 必須スキルのため、以下にまとめる
   - [ ] TensorFlow の異なったバージョンによる互換性の違いについて理解している。
 
 ## [00\_モデルの構築と訓練](00_モデルの構築と訓練)
@@ -74,3 +75,115 @@
 - [ ] 機能とラベルを準備する。
 - [ ] シーケンスのバイアスを特定して補完する。
 - [ ] 時系列モデル、シーケンス モデル、予測モデルでの学習率を動的に調整する。
+
+## <a name="save_load">モデルの保存/読み込み</a>
+
+### 重みを保存する
+
+1. 訓練の途中あるいは終了後にチェックポイントを自動的に保存する
+
+   ```python
+   # pathをセットする。
+   checkpoint_path = "training_1/cp.ckpt"
+   checkpoint_dir = os.path.dirname(checkpoint_path)
+
+   # チェックポイントコールバックを作る
+   cp_callback = tf.keras.callbacks.ModelCheckpoint(
+       checkpoint_path,
+       save_weights_only=True,
+       verbose=1)
+
+   # 新しいコールバックを用いるようモデルを訓練
+   model.fit(train_images,
+           train_labels,
+           epochs=10,
+           validation_data=(test_images,test_labels),
+           callbacks=[cp_callback])  # 訓練にコールバックを渡す
+
+   # save と loadの前後でacc, lossが同程度であることが確認できる
+   loss,acc = model.evaluate(test_images,  test_labels, verbose=2)
+   ```
+
+   - これで epoch 数ごとに保存することができる
+
+   ```python
+    # ファイル名に(`str.format`を使って)エポック数を埋め込む
+    checkpoint_path = "training_2/cp-{epoch:04d}.ckpt"
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+
+    # 5エポックごとにモデルの重みを保存するコールバックを作成
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path,
+        verbose=1,
+        save_weights_only=True,
+        period=5)
+
+    # `checkpoint_path` フォーマットで重みを保存
+    model.save_weights(checkpoint_path.format(epoch=0))
+
+   ```
+
+1. チェックポイントからロードする。
+
+   ```python
+   # modelのインスタンスは save前と同じである必要があるっぽい
+   model.load_weights(checkpoint_path)
+   # save と loadの前後でacc, lossが同程度であることが確認できる
+   loss,acc = model.evaluate(test_images,  test_labels, verbose=2)
+
+   # checkpointディレクトリから最新のチェックポイントのパスを取り出す
+   latest = tf.train.latest_checkpoint(checkpoint_dir)
+   latest
+   ```
+
+1. 手動で保存,ロードする
+
+   ```python
+   # 重みの保存
+   model.save_weights('./checkpoints/my_checkpoint')
+
+   # 新しいモデルのインスタンスを作成
+   model = create_model()
+
+   # 重みの復元
+   model.load_weights('./checkpoints/my_checkpoint')
+   ```
+
+### モデル全体を保存する
+
+- モデル全体を 2 つの異なるファイルフォーマット (`SavedModel` と `HDF5`) に保存できます。
+
+- モデルの保存(SaveModel)
+
+  ```python
+  # モデル全体を SavedModel として保存
+  !mkdir -p saved_model
+  model.save('saved_model/my_model')
+  ```
+
+  - モデルのロード
+
+  ```python
+  new_model = tf.keras.models.load_model('saved_model/my_model')
+
+  # アーキテクチャを確認
+  new_model.summary()
+  ```
+
+- モデルの保存(HDF5)
+
+  ```python
+  # HDF5 ファイルにモデル全体を保存
+  # 拡張子 '.h5' はモデルが HDF5 で保存されているということを暗示する
+  model.save('my_model.h5')
+  ```
+
+- モデルのロード
+
+  ```python
+  # 同じモデルを読み込んで、重みやオプティマイザーを含むモデル全体を再作成
+  new_model = tf.keras.models.load_model('my_model.h5')
+
+  # モデルのアーキテクチャを表示
+  new_model.summary()
+  ```
