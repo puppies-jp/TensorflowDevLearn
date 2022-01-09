@@ -10,7 +10,7 @@
 
 - [tutorial2](#2)
 
-  - [ ] さまざまな形状やサイズのリアルワールド画像を使用する。
+  - [ ] [さまざまな形状やサイズのリアルワールド画像を使用する。](#ImageDataGenerator)
 
     - [ ] 画素数、channel 数の違うデータの扱いのこと？
 
@@ -105,5 +105,44 @@ for i in range(len(res)):
 ## <a name="2">tutorial2</a>
 
 ```python
+
+```
+
+## <a name="ImageDataGenerator">ImageDataGenerator</a>
+
+- 画像を適切に前処理された状態にしていく(一連の流れは ImageDataGenerator がやってくれる)
+
+  1. ディスクから画像を読み取ります。
+  2. これらの`画像のコンテンツをデコードし、RGB 値にしたがって適切なグリッド形式に変換`します。
+  3. それらを浮動小数点テンソルに変換します。
+  4. ニューラルネットワークは小さな入力値を扱う方が適しているため、`テンソルを 0〜255 の値から 0〜1 の値にリスケーリング`します。
+
+- [ImageDataGenerator リンク](https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/image/ImageDataGenerator)
+- [flow_from_directory リンク](https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/image/ImageDataGenerator#flow_from_directory)
+
+```python
+# ImageDataGenerator生成
+# 🌟 "data_format"オプションから"channel first/last"を選択できる
+train_image_generator = ImageDataGenerator(rescale=1./255) # 学習データのジェネレータ
+validation_image_generator = ImageDataGenerator(rescale=1./255) # 検証データのジェネレータ
+
+# 🌟 flow_from_directoryからディレクトリを指定して画像を
+train_data_gen = train_image_generator.flow_from_directory(
+    batch_size=batch_size,
+    directory=train_dir,
+    shuffle=True,
+    target_size=(IMG_HEIGHT, IMG_WIDTH),
+    class_mode='binary'
+    )
+
+val_data_gen = validation_image_generator.flow_from_directory(
+    batch_size=batch_size,
+    directory=validation_dir,
+    target_size=(IMG_HEIGHT, IMG_WIDTH),
+    # 🌟 class_mode で どのような分類かをしているす
+    # "categorical", "binary", "sparse", "input", or None.
+    # Default: "categorical".
+    class_mode='binary'
+    )
 
 ```
