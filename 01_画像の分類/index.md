@@ -10,13 +10,13 @@
 
 - [tutorial2](#2)
 
-  - [ ] [さまざまな形状やサイズのリアルワールド画像を使用する。](#ImageDataGenerator)
+  - [x] [**ImageDataGenerator** さまざまな形状やサイズのリアルワールド画像を使用する。](#ImageDataGenerator)
 
-    - [ ] 画素数、channel 数の違うデータの扱いのこと？
+    - 画素数、channel 数の違うデータの扱いのこと？
 
-  - [ ] 画像の拡張を使用して過剰適合を回避する。
-  - [ ] ImageDataGenerator を使用する。
-  - [ ] ImageDataGenerator を使用して、ディレクトリ構造に基づいて画像にラベルを付ける方法について理解している。
+  - [x] 画像の拡張を使用して過剰適合を回避する。
+  - [x] ImageDataGenerator を使用する。
+  - [x] ImageDataGenerator を使用して、ディレクトリ構造に基づいて画像にラベルを付ける方法について理解している。
 
 ## <a name="1">tutorial1</a>
 
@@ -108,6 +108,8 @@ for i in range(len(res)):
 
 ```
 
+---
+
 ## <a name="ImageDataGenerator">ImageDataGenerator</a>
 
 - 画像を適切に前処理された状態にしていく(一連の流れは ImageDataGenerator がやってくれる)
@@ -117,6 +119,11 @@ for i in range(len(res)):
   3. それらを浮動小数点テンソルに変換します。
   4. ニューラルネットワークは小さな入力値を扱う方が適しているため、`テンソルを 0〜255 の値から 0〜1 の値にリスケーリング`します。
 
+  5. [また、ImageDataGenerator にはデータの拡張機能も備わっていて、以下の操作を画像に施すことができる](#ImageExpand)
+     - 水平反転の適用
+     - 画像のランダムな回転
+     - ズームによるデータ拡張の適用
+
 - [ImageDataGenerator リンク](https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/image/ImageDataGenerator)
 - [flow_from_directory リンク](https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/image/ImageDataGenerator#flow_from_directory)
 
@@ -125,11 +132,27 @@ for i in range(len(res)):
 # 🌟 "data_format"オプションから"channel first/last"を選択できる
 train_image_generator = ImageDataGenerator(rescale=1./255) # 学習データのジェネレータ
 validation_image_generator = ImageDataGenerator(rescale=1./255) # 検証データのジェネレータ
+```
 
+- こんな感じの構成のデータセットを考える。
+
+```sh
+/Users/user/.keras/datasets/cats_and_dogs_filtered
+├── train
+│   ├── cats
+│   └── dogs
+└── validation
+    ├── cats
+    └── dogs
+
+6 directories
+```
+
+```python
 # 🌟 flow_from_directoryからディレクトリを指定して画像を
 train_data_gen = train_image_generator.flow_from_directory(
     batch_size=batch_size,
-    directory=train_dir,
+    directory=train_dir, # 🌟trainのパスを指定
     shuffle=True,
     target_size=(IMG_HEIGHT, IMG_WIDTH),
     class_mode='binary'
@@ -137,7 +160,7 @@ train_data_gen = train_image_generator.flow_from_directory(
 
 val_data_gen = validation_image_generator.flow_from_directory(
     batch_size=batch_size,
-    directory=validation_dir,
+    directory=validation_dir, # validation のパスを指定
     target_size=(IMG_HEIGHT, IMG_WIDTH),
     # 🌟 class_mode で どのような分類かをしているす
     # "categorical", "binary", "sparse", "input", or None.
@@ -145,4 +168,17 @@ val_data_gen = validation_image_generator.flow_from_directory(
     class_mode='binary'
     )
 
+```
+
+## <a name="ImageExpand">画像の拡張</a>
+
+```python
+image_gen_train = ImageDataGenerator(
+                    rescale=1./255,  # リスケール
+                    rotation_range=45,  # 左右45degの範囲で回転
+                    width_shift_range=.15, # 幅シフト
+                    height_shift_range=.15, # 高さシフト
+                    horizontal_flip=True,  # 水平反転
+                    zoom_range=0.5  # ズーム
+                    )
 ```
