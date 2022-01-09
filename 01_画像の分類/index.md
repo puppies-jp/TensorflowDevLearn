@@ -104,12 +104,6 @@ for i in range(len(res)):
 
 ## <a name="2">tutorial2</a>
 
-```python
-
-```
-
----
-
 ## <a name="ImageDataGenerator">ImageDataGenerator</a>
 
 - 画像を適切に前処理された状態にしていく(一連の流れは ImageDataGenerator がやってくれる)
