@@ -182,3 +182,6 @@ image_gen_train = ImageDataGenerator(
                     zoom_range=0.5  # ズーム
                     )
 ```
+
+- こんなイメージ
+  ![Cats](cats.png)
