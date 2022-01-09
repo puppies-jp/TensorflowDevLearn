@@ -171,7 +171,3 @@ plot_history([('baseline', baseline_history),
 
   - Baseline と Bigger の train,val が早々に乖離して過学習を起こしていることが分かる。
     ![OverFit.png](OverFit.png)
-
-- [ ] 重みの正則化(L1 正則化、L2 正則化などをして過学習を防ぐ)
-- [ ] バッチ正規化
-- [ ] 訓練データを増やす
