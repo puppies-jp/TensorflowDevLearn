@@ -6,12 +6,12 @@
 
 - [tutorial1](#tutorial1)
 
-  - [ ] TensorFlow を使用して機械学習(ML)モデルの構築、コンパイル、訓練を行う。
+  - [x] TensorFlow を使用して機械学習(ML)モデルの構築、コンパイル、訓練を行う。
   - [ ] データを前処理してモデルで使用できるようにする。
   - [x] モデルを使用して結果を予測する。
   - [x] 複数の層で構成されるシーケンスモデルを構築する。
-  - [ ] 二項分類のモデルを構築して訓練する。
-  - [ ] 多項分類のモデルを構築して訓練する。
+  - [x] 二項分類のモデルを構築して訓練する。
+  - [x] 多項分類のモデルを構築して訓練する。
 
 - [tutorial2](#tutorial2)
 
@@ -38,8 +38,80 @@
 
 ## <a name="tutorial1">tutorial1</a>
 
-```python
+### 二項分類
 
+```python
+# 入力の形式は映画レビューで使われている語彙数（10,000語）
+vocab_size = 10000
+
+"""
+    🌟 二項しかないため、0,1をどちらかに割り振って
+    🌟 softmaxで0~1の値となるようにする。(おそらく多項分類の二項にしてもいいんじゃないかな？)
+"""
+
+model = keras.Sequential()
+model.add(keras.layers.Embedding(vocab_size, 16))
+model.add(keras.layers.GlobalAveragePooling1D())
+model.add(keras.layers.Dense(16, activation='relu'))
+model.add(keras.layers.Dense(1, activation='sigmoid'))
+
+"""
+    🌟 二値分類問題であり、モデルの出力は確率（1ユニットの層とシグモイド活性化関数）の場合、
+    🌟 binary_crossentropyを使える。
+    (回帰問題(家屋の値段を推定するとか)の場合、mean_squared_error（平均二乗誤差）を使うこともできる。)
+"""
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+```
+
+### 多項分類
+
+- 以下のように、出力層を多項数だけ用意し、loss 関数に適切な関数を指定すれば OK
+
+```python
+"""
+    🌟 多項分類のため、出力層を求めるクラスの数だけ出力させ、
+    🌟 softmaxで0~1の値となるようにする必要がある。
+"""
+model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(28, 28)),
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dense(10, activation='softmax')
+])
+
+"""
+    🌟 多項分類においてloss関数の評価は多項分の評価にあったものを選ぶ必要がある。
+    今回の場合、以下などが選ばれる。
+        sparse_categorical_crossentropy
+"""
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+```
+
+### 回帰問題
+
+```python
+def build_model():
+  model = keras.Sequential([
+    layers.Dense(64, activation='relu', input_shape=[len(train_dataset.keys())]),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(1)
+  ])
+
+  optimizer = tf.keras.optimizers.RMSprop(0.001)
+
+  """
+    🌟 loss関数にmse(mean_squared_error（平均二乗誤差))を指定することで、評価している。
+    🌟 metricにはmse,maeとかを選択する。
+  """
+  model.compile(loss='mse',
+                optimizer=optimizer,
+                metrics=['mae', 'mse'])
+  return model
 ```
 
 ## <a name="tutorial2">tutorial2</a>
