@@ -18,6 +18,8 @@
   - [x] ImageDataGenerator を使用する。
   - [x] ImageDataGenerator を使用して、ディレクトリ構造に基づいて画像にラベルを付ける方法について理解している。
 
+---
+
 ## <a name="1">tutorial1</a>
 
 ### model の構築からコンパイルまで
