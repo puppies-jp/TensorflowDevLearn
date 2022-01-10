@@ -39,10 +39,42 @@
 ## <a name="tutorial1">tutorial1</a>
 
 - [x] TensorFlow を使用して機械学習(ML)モデルの構築、コンパイル、訓練を行う。
-- [ ] データを前処理してモデルで使用できるようにする。
+- [x] データを前処理してモデルで使用できるようにする。
 - [x] モデルを使用して結果を予測する。
 
 ```python
+"""🌟 モデルの構築
+"""
+model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(28, 28)),
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dense(10, activation='softmax')
+])
+
+"""🌟 モデルのコンパイル
+"""
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+"""🌟 モデルの訓練
+"""
+model.fit(train_images, train_labels, epochs=5)
+
+"""🌟 モデルの正解率の評価
+"""
+test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+print('Test accuracy:', test_acc)
+
+"""
+    🌟 予測
+        - 入力には入力の配列を入れる必要がある。
+        - 多項分類の場合、10個の配列で渡される。
+          10個の中から最大値のインデックスを指定して予測結果とする。
+        - 二項分類の場合、1つの数字(確率)で渡される。
+"""
+predictions = model.predict(test_images)
+np.argmax(predictions[0])
 
 ```
 
@@ -109,7 +141,9 @@ model.compile(optimizer='adam',
 ```python
 def build_model():
   model = keras.Sequential([
-    layers.Dense(64, activation='relu', input_shape=[len(train_dataset.keys())]),
+    layers.Dense(64, activation='relu',
+        # tuple or list形式で渡す必要がある。(数字)だとtupleと認識しないので(数字,)とすることで1Dで渡すことができる。
+        input_shape=[len(train_dataset.keys())]),
     layers.Dense(64, activation='relu'),
     layers.Dense(1)
   ])
