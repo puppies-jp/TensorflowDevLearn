@@ -164,6 +164,12 @@ def build_model():
 
 ## <a name="tutorial2">tutorial2</a>
 
+- [ ] 事前訓練されたモデルを使用する(転移学習)。
+- [ ] 事前訓練されたモデルから機能を抽出する。
+- [ ] モデルへの入力が適切な形状で行われるようにする。
+- [ ] テストデータをニューラルネットワークの入力の形状に合わせたものにする。
+- [ ] ニューラル ネットワークの出力データを、テストデータで指定された入力の形状に合わせたものにする。
+
 ```python
 
 ```
@@ -172,7 +178,43 @@ def build_model():
 
 ## <a name="tutorial3">tutorial3</a>
 
+- [ ] データの一括読み込みについて理解している
+- [x] [コールバックを使用して、訓練サイクルの終了を呼び出す。](#Callback)
+- [ ] 複数のソースのデータセットを使用する。
+- [ ] 複数のフォーマット(json や csv など)のデータセットを使用する。
+- [ ] tf.data.datasets のデータセットを使用する。
+
 ```python
+
+```
+
+- <a name="Callback">コールバック</a>
+
+  - [コールバック関連リンク](https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/Callback)
+
+  - EarlyStop の他にも学習率、checkpoint の保存、tensorboard へのアウトプットなどができるコールバックも用意されてる。
+
+```python
+
+# 🌟 コールバックを作る際はこんな感じでCallbackクラスを継承して作成する。
+class PrintDot(keras.callbacks.Callback):
+  # エポックが終わるごとにドットを一つ出力することで進捗を表示
+  def on_epoch_end(self, epoch, logs):
+    if epoch % 100 == 0: print('')
+    print('.', end='')
+
+
+# 🌟🌟 メトリックに改善が見られない場合に終了するコールバック
+# patience は改善が見られるかを監視するエポック数を表すパラメーター
+early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+
+history = model.fit(
+    normed_train_data,
+    train_labels,
+    epochs=EPOCHS,
+    validation_split = 0.2,
+    verbose=0,
+    callbacks=[early_stop, PrintDot()])
 
 ```
 
