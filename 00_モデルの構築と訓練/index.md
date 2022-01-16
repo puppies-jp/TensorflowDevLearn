@@ -24,7 +24,7 @@
 - [tutorial3](#tutorial3)
 
   - [ ] データの一括読み込みについて理解している
-  - [ ] コールバックを使用して、訓練サイクルの終了を呼び出す。
+  - [x] コールバックを使用して、訓練サイクルの終了を呼び出す。
   - [ ] 複数のソースのデータセットを使用する。
   - [ ] 複数のフォーマット(json や csv など)のデータセットを使用する。
   - [ ] tf.data.datasets のデータセットを使用する。
@@ -178,7 +178,7 @@ def build_model():
 
 ## <a name="tutorial3">tutorial3</a>
 
-- [ ] データの一括読み込みについて理解している
+- [ ] [データの一括読み込みについて理解している](#LoadData)
 - [x] [コールバックを使用して、訓練サイクルの終了を呼び出す。](#Callback)
 - [ ] 複数のソースのデータセットを使用する。
 - [ ] 複数のフォーマット(json や csv など)のデータセットを使用する。
@@ -188,11 +188,71 @@ def build_model():
 
 ```
 
-- <a name="Callback">コールバック</a>
+### <a name=LoadData>データの一括読み込みについて理解している</a>
 
-  - [コールバック関連リンク](https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/Callback)
+- 画像の読み込み
+  - ディレクトリの階層でラベルを分けられたデータを前提に記述する。
 
-  - EarlyStop の他にも学習率、checkpoint の保存、tensorboard へのアウトプットなどができるコールバックも用意されてる。
+```python
+import tensorflow as tf
+AUTOTUNE = tf.data.experimental.AUTOTUNE # 🌟 別になくてもいい、変数として確保しておいているだけ
+```
+
+```python
+import pathlib
+
+# 🌟 flower dataset を使用する。
+data_root_orig =
+    tf.keras.utils.get_file(origin='https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz',
+    fname='flower_photos',
+    untar=True
+)
+data_root = pathlib.Path(data_root_orig)
+print(data_root)
+
+# 🌟 all_image_pathsにはデータセットの画像のパスが格納される。
+all_image_paths = list(data_root.glob('*/*'))
+all_image_paths = [str(path) for path in all_image_paths]
+
+import random
+random.shuffle(all_image_paths)
+
+# 🌟画像パスのデコード方法
+img_raw = tf.io.read_file(img_path) # 🌟この段階ではファイルパスのテンソル
+img_tensor = tf.image.decode_image(img_raw) # 🌟 ここで3chの画像にデコードされる
+img_final = tf.image.resize(img_tensor, [192, 192]) # リサイズ
+img_final = img_final/255.0 # rescale
+
+# --------------------------------------- #
+# 🌟関数にまとめるとこんな感じ🌟
+def preprocess_image(image):
+  image = tf.image.decode_jpeg(image, channels=3)
+  image = tf.image.resize(image, [192, 192])
+  image /= 255.0  # normalize to [0,1] range
+
+  return image
+
+def load_and_preprocess_image(path):
+  image = tf.io.read_file(path)
+  return preprocess_image(image)
+# --------------------------------------- #
+
+
+# 🌟　以下のようにして使うことで画像を実行時にロードし整形する　データセットを作成できる。
+path_ds = tf.data.Dataset.from_tensor_slices(
+            all_image_paths) # この段階では画像のパスのテンソル
+image_ds = path_ds.map(
+            load_and_preprocess_image, # 🌟　ここにdecodeする関数を設定する。
+            num_parallel_calls=AUTOTUNE
+    )
+
+```
+
+### <a name="Callback">コールバック</a>
+
+- [コールバック関連リンク](https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/Callback)
+
+- EarlyStop の他にも学習率、checkpoint の保存、tensorboard へのアウトプットなどができるコールバックも用意されてる。
 
 ```python
 
