@@ -23,7 +23,7 @@
 
 - [tutorial3](#tutorial3)
 
-  - [ ] データの一括読み込みについて理解している
+  - [x] データの一括読み込みについて理解している
   - [x] コールバックを使用して、訓練サイクルの終了を呼び出す。
   - [ ] 複数のソースのデータセットを使用する。
   - [ ] 複数のフォーマット(json や csv など)のデータセットを使用する。
@@ -178,7 +178,7 @@ def build_model():
 
 ## <a name="tutorial3">tutorial3</a>
 
-- [ ] [データの一括読み込みについて理解している](#LoadData)
+- [x] [データの一括読み込みについて理解している](#LoadData)
 - [x] [コールバックを使用して、訓練サイクルの終了を呼び出す。](#Callback)
 - [ ] 複数のソースのデータセットを使用する。
 - [ ] 複数のフォーマット(json や csv など)のデータセットを使用する。
@@ -239,11 +239,15 @@ def load_and_preprocess_image(path):
 
 
 # 🌟　以下のようにして使うことで画像を実行時にロードし整形する　データセットを作成できる。
+# この段階では画像のパスのテンソル
 path_ds = tf.data.Dataset.from_tensor_slices(
-            all_image_paths) # この段階では画像のパスのテンソル
+            all_image_paths)
+
+# 🌟ここでパスを画像のテンソルに変換するマップを設定することで、
+#  画像のテンソルデータセットとなる。
 image_ds = path_ds.map(
-            load_and_preprocess_image, # 🌟　ここにdecodeする関数を設定する。
-            num_parallel_calls=AUTOTUNE
+    load_and_preprocess_image, # 🌟　ここにdecodeする関数を設定する。
+    num_parallel_calls=AUTOTUNE # 🌟 ここ
     )
 
 ```
