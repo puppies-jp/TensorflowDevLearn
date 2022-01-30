@@ -10,6 +10,9 @@ df = df[5::6]
 # 🌟 こんな感じですることで、
 # 文字列をdatetimeで読み込むことができる。
 date_time = pd.to_datetime(df.pop('Date Time'), format='%d.%m.%Y %H:%M:%S')
+
+# 🌟　こうすることで、datetimeのクラスから、floatのtimestamp(seconds)に変換できる
+timestamp_s = date_time.map(pd.Timestamp.timestamp)
 ```
 
 ## グラフ作成系
