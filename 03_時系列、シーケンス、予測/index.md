@@ -9,6 +9,12 @@
 - [ ] 時系列学習で使用するデータを準備する。
 - [ ] 平均絶対誤差(MAE)と、それを使用してシーケンス モデルの精度を評価する方法について理解する。
 - [ ] 時系列モデル、シーケンス モデル、予測モデルで、RNN および CNN を使用する。
+  - 以下に主なモデルを挙げる
+    - [線形モデル](#liner)
+    - [Multi-step dense](#dense)
+    - [畳み込みニューラルネットワーク(CNN)](#CNN)
+    - [リカレントニューラルネットワーク(RNN)](#RNN)
+
 - [ ] 追跡ウィンドウまたは中央ウィンドウのどちらを使用すべきかを特定する。
 
 - 誤訳？
@@ -20,7 +26,7 @@
 
 ---
 
-### 線形モデル
+### <a name=liner>線形モデル</a>
 
 ```python
 
@@ -52,7 +58,7 @@ _ = axis.set_xticklabels(train_df.columns, rotation=90)
 
 ![線形モデル重み表示](liner_model_weight.png)
 
-### Multi-step dense モデル
+### <a name=dense>Multi-step dense モデル</a>
 
 ```python
 multi_step_dense = tf.keras.Sequential([
@@ -73,9 +79,12 @@ multi_step_dense = tf.keras.Sequential([
 
 ![マルチステップモデル](conv_window.png)
 
-### 畳み込みニューラルネットワークモデル
+### <a name=CNN>畳み込みニューラルネットワークモデル</a>
 
 - **`Multi-step dense モデル`** と同じで各予測への入力として複数のタイムステップを取るモデル。
+
+- `tf.keras.layers.Flatten`と最初の`tf.keras.layers.Dense`は、  
+`tf.keras.layers.Conv1D`に置き換えられます。
 
 ```python
 conv_model = tf.keras.Sequential([
@@ -85,7 +94,8 @@ conv_model = tf.keras.Sequential([
     tf.keras.layers.Dense(units=32, activation='relu'),
     tf.keras.layers.Dense(units=1),
 ])
-
 ```
 
 ![Convolution neural network](wide_conv_window.png)
+
+### <a name=RNN>リカレントニューラルネットワーク</a>
