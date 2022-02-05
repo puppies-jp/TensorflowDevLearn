@@ -99,3 +99,22 @@ conv_model = tf.keras.Sequential([
 ![Convolution neural network](wide_conv_window.png)
 
 ### <a name=RNN>リカレントニューラルネットワーク</a>
+
+- `リカレントニューラルネットワーク（RNN）`は、時系列データに適したニューラルネットワークの一種です。 RNNは時系列を段階的に処理し、時間ステップごとに内部状態を維持します
+
+- ここでは、`Long Short-Term Memory（ tf.keras.layers.LSTM ）`と呼ばれるRNNレイヤーを使用します
+  - **重要なポイント**として コンストラクター引数の **`return_sequences`** 引数がある。
+  これは`true/false`を設定し、戻り値の出力を制御するパラメータである。
+
+    - `LSTM return_sequences= false`の場合
+      - レイヤーは最後のタイムステップの出力のみを返し、`単一の予測を行う前にモデルに内部状態をウォームアップする`時間を与えます
+
+    ![LSTM return_sequences= false](lstm_1_window.png)
+
+    - `LSTM return_sequences= true`の場合
+      - レイヤーは入力ごとに出力を返します。
+        - 以下のメリットがある。
+          - RNNレイヤーのスタッキング。
+          - 複数のタイムステップで同時にモデルをトレーニングします
+
+    ![LSTM return_sequences= true](lstm_many_window.png)
