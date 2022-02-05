@@ -202,8 +202,9 @@ AUTOTUNE = tf.data.experimental.AUTOTUNE # 🌟 別になくてもいい、変�
 import pathlib
 
 # 🌟 flower dataset を使用する。
+dataset_url = 'https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz'
 data_root_orig =
-    tf.keras.utils.get_file(origin='https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz',
+    tf.keras.utils.get_file(origin=dataset_url,
     fname='flower_photos',
     untar=True
 )
