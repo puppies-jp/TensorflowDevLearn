@@ -2,18 +2,18 @@
 
 - [tutorial2](#tutorial2)
   - [x] 事前訓練されたモデルを使用する(転移学習)。
-  - [ ] 事前訓練されたモデルから機能を抽出する。
+  - [x] 事前訓練されたモデルから機能を抽出する。
   - [x] モデルへの入力が適切な形状で行われるようにする。
-  - [ ] テストデータをニューラルネットワークの入力の形状に合わせたものにする。
-  - [ ] ニューラル ネットワークの出力データを、テストデータで指定された入力の形状に合わせたものにする。
+  - [x] テストデータをニューラルネットワークの入力の形状に合わせたものにする。
+  - [x] ニューラル ネットワークの出力データを、テストデータで指定された入力の形状に合わせたものにする。
 
 - [転移学習](#Transfer_FineTune)
 - [ハイパーパラメータチューニング](#Parameter)
 
 ## <a name=Transfer_FineTune> 転移学習 FineTune</a>
 
-[転移学習](#Transfer)
-[FineTune](#FineTune)
+- [転移学習](#Transfer)
+- [FineTune](#FineTune)
 
 ### <a name=Transfer>転移学習</a>
 
@@ -71,5 +71,49 @@ model = tf.keras.Model(inputs, outputs)
 ```
 
 ### <a name=FineTune>FineTune</a>
+
+- 転移学習でパフォーマンスをさらに向上させる方法の 1 つに、追加した分類器のトレーニングと並行して、事前トレーニング済みモデルの最上位レイヤーの重みをトレーニング（または「ファインチューニング」）するというものがあります。
+
+  - 🌟 **事前トレーニング済みモデルをトレーニング不可に設定し、最上位の分類器をトレーニングした後に行うようにしてください。** 事前トレーニング済みモデルの上にランダムに初期化された分類器を追加してすべてのレイヤーを結合トレーニングしようとすると、
+  `（分類器からのランダムな重みにより）`
+  **`勾配の更新規模が大きすぎて`**、
+  `事前トレーニング済みモデルが学習したことを忘れてしまいます`
+
+```python
+
+"""🌟 ここをtrueにすることで、
+    　base_modelをトレーニングできる状態にする。 
+"""
+base_model.trainable = True
+
+# Let's take a look to see how many layers are in the base model
+print(
+  "Number of layers in the base model: ", 
+  # 🌟 こうすることで、モデルのレイヤー数が確認できる。
+  len(base_model.layers))
+
+"""🌟 下のレイヤー(入力層)側から100のレイヤー
+      までの重みを変更できなくする。
+"""
+# Fine-tune from this layer onwards
+fine_tune_at = 100 
+
+# Freeze all the layers before the `fine_tune_at` layer
+for layer in base_model.layers[:fine_tune_at]:
+  layer.trainable =  False
+
+"""🌟 設定後はビルドすること
+"""
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              optimizer = tf.keras.optimizers.RMSprop(lr=base_learning_rate/10),
+              metrics=['accuracy'])
+
+```
+
+- 学習できるレイヤーは以下のようにして調べられる
+
+```python
+len(model.trainable_variables)
+```
 
 ## <a name=Parameter>Hyperparameters tuning</a>
