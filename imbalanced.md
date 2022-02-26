@@ -2,6 +2,11 @@
 
 - このページでは不均衡なデータセットのサンプリングに対するアプローチ方法をまとめます。
 
+- [混同行列(Confusion Matrix)](#Confusion)
+- [ROCプロット](#ROC)
+  - 出力しきい値を調整するだけでモデルが到達できるパフォーマンスの範囲を一目で示す
+  2値問題などで閾値を決めることなどに使える。
+
 ## アンダーサンプリング、オーバーサンプリング
 
 - アンダーサンプリング
@@ -34,7 +39,7 @@
   resampled_ds = resampled_ds.batch(BATCH_SIZE).prefetch(2)
   ```
 
-## 混同行列(Confusion Matrix)
+## <a name=Confusion>混同行列(Confusion Matrix)</a>
 
 - 参考サイト
   - [混同行列](https://qiita.com/TsutomuNakamura/items/a1a6a02cb9bb0dcbb37f#%E7%8C%AB%E3%82%92%E6%8E%A8%E6%B8%AC%E3%81%99%E3%82%8B2-%E5%80%A4%E5%88%86%E9%A1%9E%E3%81%AE%E6%A9%9F%E6%A2%B0%E5%AD%A6%E7%BF%92%E3%83%A2%E3%83%87%E3%83%AB%E3%82%92%E4%BE%8B%E3%81%AB%E6%B7%B7%E5%90%8C%E8%A1%8C%E5%88%97%E3%82%92%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B)
@@ -65,3 +70,33 @@ test_predictions_baseline =
 """🌟3 プロットを実行する"""
 plot_cm(test_labels, test_predictions_baseline)
 ```
+
+## <a name="ROC">ROCプロット</a>
+
+```python
+
+"""🌟1 ROC出力関数を定義"""
+def plot_roc(name, labels, predictions, **kwargs):
+    fp, tp, _ = sklearn.metrics.roc_curve(labels, predictions)
+    plt.plot(100*fp, 100*tp, label=name, linewidth=2, **kwargs)
+    plt.xlabel('False positives [%]')
+    plt.ylabel('True positives [%]')
+    plt.xlim([-0.5,20])
+    plt.ylim([80,100.5])
+    plt.grid(True)
+    ax = plt.gca()
+    ax.set_aspect('equal')
+
+"""🌟2 predictを実行する"""
+train_predictions_baseline = model.predict(train_features, batch_size=BATCH_SIZE)
+test_predictions_baseline = model.predict(test_features, batch_size=BATCH_SIZE)
+
+"""🌟3 呼び出すだけ
+       ※plt.figureとかやってないことに注意
+"""
+plot_roc("Train Baseline", train_labels, train_predictions_baseline, color=colors[0])
+plot_roc("Test Baseline", test_labels, test_predictions_baseline, color=colors[0], linestyle='--')
+plt.legend(loc='lower right');
+```
+
+![ROCplot1](img/ROCPlot1.png)
