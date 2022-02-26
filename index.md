@@ -4,6 +4,7 @@
 
 - 多分使うリンク
   - [転移学習,FineTune,Hyperparameter Tune](00_モデルの構築と訓練/FineTune)
+  - [不均衡なデータの検証](imbalanced)
 
 ## [00_TensorFlow デベロッパースキル](00_デベロッパースキル)
 
