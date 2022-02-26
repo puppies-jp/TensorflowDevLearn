@@ -71,6 +71,8 @@ test_predictions_baseline =
 plot_cm(test_labels, test_predictions_baseline)
 ```
 
+![ConfusionMatrix](img/confusionMX.png)
+
 ## <a name="ROC">ROCプロット</a>
 
 ```python
