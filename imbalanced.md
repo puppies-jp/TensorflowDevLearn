@@ -9,9 +9,24 @@
 - [AUPRC](#AUPRC)
 
 ---
-- Accuracy: $  \frac{\text{true samples}}{\text{total samples}}$
-  - 正解率  
 
+```python
+"""🌟 色々なメトリクス"""
+METRICS = [
+      keras.metrics.TruePositives(name='tp'),
+      keras.metrics.FalsePositives(name='fp'),
+      keras.metrics.TrueNegatives(name='tn'),
+      keras.metrics.FalseNegatives(name='fn'), 
+      keras.metrics.BinaryAccuracy(name='accuracy'),
+      keras.metrics.Precision(name='precision'),
+      keras.metrics.Recall(name='recall'),
+      keras.metrics.AUC(name='auc'),
+      keras.metrics.AUC(name='prc', curve='PR'), # precision-recall curve
+]
+```
+
+- Accuracy: $\frac{\text{true samples}}{\text{total samples}}$
+  - 正解率  
 - この辺は2項分類に割り当てる話かな？
   - Precision: $\frac{\text{true positives}}{\text{true positives + false positives}}$
     - positiveと判定した内正しく判定できた割合
@@ -19,6 +34,7 @@
     - 実際のtrueの数とtrue判定した数の比
   - AUC:
   - AUPRC:
+
 ---
 
 ## アンダーサンプリング、オーバーサンプリング
