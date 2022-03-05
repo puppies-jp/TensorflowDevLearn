@@ -6,6 +6,20 @@
 - [ROCプロット](#ROC)
   - 出力しきい値を調整するだけでモデルが到達できるパフォーマンスの範囲を一目で示す
   2値問題などで閾値を決めることなどに使える。
+- [AUPRC](#AUPRC)
+
+---
+- Accuracy: $  \frac{\text{true samples}}{\text{total samples}}$
+  - 正解率  
+
+- この辺は2項分類に割り当てる話かな？
+  - Precision: $\frac{\text{true positives}}{\text{true positives + false positives}}$
+    - positiveと判定した内正しく判定できた割合
+  - Recall: $\frac{\text{true positives}}{\text{true positives + false negatives}}$
+    - 実際のtrueの数とtrue判定した数の比
+  - AUC:
+  - AUPRC:
+---
 
 ## アンダーサンプリング、オーバーサンプリング
 
@@ -102,3 +116,28 @@ plt.legend(loc='lower right');
 ```
 
 ![ROCplot1](img/ROCPlot1.png)
+
+## <a name=AUPRC>AUPRC</a>
+
+```python
+"""🌟AUPRC"""
+def plot_prc(name, labels, predictions, **kwargs):
+    precision, recall, _ = sklearn.metrics.precision_recall_curve(labels, predictions)
+
+    plt.plot(precision, recall, label=name, linewidth=2, **kwargs)
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.grid(True)
+    ax = plt.gca()
+    ax.set_aspect('equal')
+
+plot_prc("Train Baseline", train_labels, train_predictions_baseline, color=colors[0])
+plot_prc("Test Baseline", test_labels, test_predictions_baseline, color=colors[0], linestyle='--')
+
+plot_prc("Train Weighted", train_labels, train_predictions_weighted, color=colors[1])
+plot_prc("Test Weighted", test_labels, test_predictions_weighted, color=colors[1], linestyle='--')
+
+plt.legend(loc='lower right');
+```
+
+![AUPRCPlot](img/AUPRCPlot.png)
