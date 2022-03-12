@@ -12,3 +12,86 @@
 
 ---
 
+## 文字列データセットの作成方法
+
+- 以下に手順をまとめる
+
+    1. 文字列を整数にエンコードした配列にし、単語のマップを作成する
+
+    1. 配列をワンホット（one-hot）エンコーディングする。
+
+    1. 配列をパディングによって同じ長さに揃え、`(サンプル数 * 許容できる長さの最大値)` の形の整数テンソルに変更する。
+
+        1. 数値の配列をシンプルにpaddingする方法
+
+            ```python
+            train_data = 
+                keras.preprocessing.sequence.pad_sequences(
+                    train_data,
+                    value=word_index["<PAD>"],
+                    padding='post',
+                    maxlen=256
+                    )
+                    
+            test_data = 
+                keras.preprocessing.sequence.pad_sequences(
+                    test_data,
+                    value=word_index["<PAD>"],
+                    padding='post',
+                    maxlen=256
+                    )
+            ```
+
+        2. 🌟(ここ覚えとくこと！！)textから変換する方法 
+
+            ```python
+            def custom_standardization(input_data):
+                lowercase = tf.strings.lower(input_data)
+                
+                # 🌟 <br>タグをけす。
+                stripped_html = tf.strings.regex_replace(lowercase, '<br />', ' ')
+
+                # 🌟 punctuation == 文字列の句読点
+                # 🌟 re.escape(pattern)
+                #   pattern 中の特殊文字をエスケープします。
+                #   これは正規表現メタ文字を含みうる任意のリテラル文字列にマッチしたい時に便利です。     
+                return tf.strings.regex_replace(
+                    stripped_html,
+                    '[%s]' % re.escape(string.punctuation),
+                    ''
+                    )
+
+
+            max_features = 10000
+            sequence_length = 250
+            vectorize_layer = layers.TextVectorization(
+                standardize=custom_standardization,
+                max_tokens=max_features,
+                output_mode='int',
+                output_sequence_length=sequence_length
+                )
+            
+            # Make a text-only dataset (without labels), then call adapt
+            train_text = raw_train_ds.map(lambda x, y: x)
+            vectorize_layer.adapt(train_text)
+
+            🌟 textをvector化してlabelと一緒に出力する。
+            def vectorize_text(text, label):
+                text = tf.expand_dims(text, -1)
+                return vectorize_layer(text), label
+
+            # 🌟 使用例1 :textとlabelからVectorとlabelを生成する。
+            # retrieve a batch (of 32 reviews and labels) from the dataset
+            text_batch, label_batch = next(iter(raw_train_ds))
+            first_review, first_label = text_batch[0], label_batch[0]
+            print("Review", first_review)
+            print("Label", raw_train_ds.class_names[first_label])
+            print("Vectorized review", vectorize_text(first_review, first_label))
+
+            # 🌟 datasetを作成する。
+            # 🌟 tf.keras.utils.text_dataset_from_directoryにて作成したdataset
+            train_ds = raw_train_ds.map(vectorize_text)
+            val_ds = raw_val_ds.map(vectorize_text)
+            test_ds = raw_test_ds.map(vectorize_text)
+
+            ```
