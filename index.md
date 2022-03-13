@@ -1,5 +1,19 @@
 # TensorFlow デベロッパー認定資格
 
+```sh
+# なんかcondaだと2.8.0でインストールされなかった。。
+pip install tensorflow
+
+pip install tensorflow-hub
+pip install tensorflow-datasets
+
+pip install -q seaborn
+pip install -q -U keras-tuner
+
+# Required to save models in HDF5 format
+pip install pyyaml h5py  
+```
+
 - TensorFlow デベロッパー認定資格の勉強の備忘録として作成した
 
 - 多分使うリンク

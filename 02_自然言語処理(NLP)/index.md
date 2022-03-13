@@ -4,7 +4,7 @@
 - [ ] TensorFlow で使用するテキストを用意する。
 - [ ] 二項分類を使用してテキストのカテゴリを特定するモデルを構築する
 - [ ] 多項分類を使用してテキストのカテゴリを特定するモデルを構築する
-- [ ] TensorFlow モデルで単語埋め込みを使用する。
+- [x] TensorFlow モデルで単語埋め込みを使用する。
 - [ ] 二項分類または多項分類のいずれかのモデルで、LSTM を使用してテキストを分類する。
 - [ ] モデルに RNN 層と GRU 層を追加する。
 - [ ] テキストを処理するモデルで、RNN、GRU、CNN を使用する。
@@ -75,7 +75,7 @@
             train_text = raw_train_ds.map(lambda x, y: x)
             vectorize_layer.adapt(train_text)
 
-            🌟 textをvector化してlabelと一緒に出力する。
+            # 🌟 textをvector化してlabelと一緒に出力する。
             def vectorize_text(text, label):
                 text = tf.expand_dims(text, -1)
                 return vectorize_layer(text), label
@@ -95,3 +95,36 @@
             test_ds = raw_test_ds.map(vectorize_text)
 
             ```
+
+## データセット作成方法2
+
+- データセットの構成を読み込む
+  - こんな感じのファイル構成で各ディレクトリにテキストが入っている構成を前提に考える
+
+```sh
+user@MacBook text % tree -d aclImdb
+aclImdb
+├── test # 検証用データセット
+│   ├── neg # label1
+│   └── pos # label2
+└── train  # 学習用データセット
+    ├── neg
+    └── pos
+
+7 directories
+```
+
+1. `text_dataset_from_directory`を使う
+こうすることでtrainからデータセットを読み込んでくれる。
+
+```python
+batch_size = 32
+seed = 42
+
+raw_train_ds = tf.keras.utils.text_dataset_from_directory(
+    'aclImdb/train', 
+    batch_size=batch_size, 
+    validation_split=0.2, 
+    subset='training', 
+    seed=seed)
+```
