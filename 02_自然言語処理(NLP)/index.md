@@ -121,10 +121,98 @@ aclImdb
 batch_size = 32
 seed = 42
 
+# 🌟trainデータセット
 raw_train_ds = tf.keras.utils.text_dataset_from_directory(
     'aclImdb/train', 
     batch_size=batch_size, 
     validation_split=0.2, 
     subset='training', 
     seed=seed)
+
+# 🌟validation データセット
+raw_val_ds = tf.keras.utils.text_dataset_from_directory(
+    'aclImdb/train', 
+    batch_size=batch_size, 
+    validation_split=0.2, 
+    subset='validation', 
+    seed=seed)
+
+for index in range(len(raw_train_ds.class_names)):
+    # 🌟 indexとラベルが対応づけられてる。
+    print(f"Label {index} corresponds to {raw_train_ds.class_names[index]}")
+    
+def custom_standardization(input_data):
+  lowercase = tf.strings.lower(input_data)
+  stripped_html = tf.strings.regex_replace(lowercase, '<br />', ' ')
+  return tf.strings.regex_replace(stripped_html,
+                                  '[%s]' % re.escape(string.punctuation),
+                                  '')
+
+# 🌟ここのパラメータを共通化しないとわけがわからなくなる
+max_features = 10000　# 🌟単語数
+sequence_length = 250 # 🌟datasetの最大文字列長
+
+vectorize_layer = layers.TextVectorization(
+    standardize=custom_standardization,
+    max_tokens=max_features,　# 🌟単語数
+    output_mode='int',
+    output_sequence_length=sequence_length　# 🌟datasetの最大文字列長
+    )
+
+def vectorize_text(text, label):
+    text = tf.expand_dims(text, -1)
+    return vectorize_layer(text), label 
+
+train_ds = raw_train_ds.map(vectorize_text)
+val_ds = raw_val_ds.map(vectorize_text)
+
+# 🌟cashe,prefchを設定する。
+AUTOTUNE = tf.data.AUTOTUNE
+
+train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+```
+
+## モデルの作成
+
+```python
+embedding_dim = 16
+
+model = tf.keras.Sequential([
+  layers.Embedding(max_features + 1, embedding_dim),
+  layers.Dropout(0.2),
+  layers.GlobalAveragePooling1D(),
+  layers.Dropout(0.2),
+  layers.Dense(1)])
+
+model.summary()
+```
+
+```python
+# 🌟🌟modelの作り方2🌟🌟
+export_model = tf.keras.Sequential([
+  ## 🌟ここにvectorize層を追加することで直接的に文字列を入力できるようになる。
+  vectorize_layer, 
+  model,
+  layers.Activation('sigmoid')
+])
+
+export_model.compile(
+    loss=losses.BinaryCrossentropy(from_logits=False), 
+    optimizer="adam", 
+    metrics=['accuracy']
+)
+
+# Test it with `raw_test_ds`, which yields raw strings
+loss, accuracy = export_model.evaluate(raw_test_ds)
+print(accuracy)
+
+examples = [
+  "The movie was great!",
+  "The movie was okay.",
+  "The movie was terrible..."
+]
+
+export_model.predict(examples)
+
 ```

@@ -14,6 +14,11 @@ pip install -q -U keras-tuner
 pip install pyyaml h5py  
 ```
 
+```python
+# dataset周りで頻出するため、ここにメモっておく
+AUTOTUNE = tf.data.AUTOTUNE
+```
+
 - TensorFlow デベロッパー認定資格の勉強の備忘録として作成した
 
 - 多分使うリンク
