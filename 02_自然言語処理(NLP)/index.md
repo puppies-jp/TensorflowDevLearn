@@ -12,7 +12,16 @@
 
 ---
 
-## 文字列データセットの作成方法
+リンク
+
+- [データセット作成](#dataset)
+- [フォルダ構成ごとにまとまったデータセット](#DirDataset)
+- [モデル作成(基本的)](#basic_model)
+- [RNN適用モデル](#rnn_model)
+
+---
+
+## <a name=dataset>文字列データセットの作成方法</a>
 
 - 以下に手順をまとめる
 
@@ -96,7 +105,7 @@
 
             ```
 
-## データセット作成方法2
+## <a name=DirDataset>データセット作成方法2</a>
 
 - データセットの構成を読み込む
   - こんな感じのファイル構成で各ディレクトリにテキストが入っている構成を前提に考える
@@ -156,7 +165,8 @@ vectorize_layer = layers.TextVectorization(
     standardize=custom_standardization,
     max_tokens=max_features,　# 🌟単語数
     output_mode='int',
-    output_sequence_length=sequence_length　# 🌟datasetの最大文字列長
+    # 🌟datasetの最大文字列長(指定しないと最大文字列長に合わせられる)
+    output_sequence_length=sequence_length　
     )
 
 def vectorize_text(text, label):
@@ -173,7 +183,7 @@ train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 ```
 
-## モデルの作成
+## <a name=basic_model>モデルの作成</a>
 
 ```python
 embedding_dim = 16
@@ -216,3 +226,6 @@ examples = [
 export_model.predict(examples)
 
 ```
+
+## <a name=rnn_model>RNNを適用したモデル</a>
+
