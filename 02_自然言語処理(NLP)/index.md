@@ -435,6 +435,7 @@ model = tf.keras.Sequential([
         tfhub_handle_preprocess = "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3"
 
         # 🌟🌟🌟　モデルの読み込み　🌟🌟🌟 
+        ## 🌟プリプロセスモデル(あくまでpreprocessモデル)
         bert_preprocess_model = hub.KerasLayer(tfhub_handle_preprocess)
 
         # 🌟ざっくりした使い方 
@@ -446,5 +447,19 @@ model = tf.keras.Sequential([
         print(f'Word Ids   : {text_preprocessed["input_word_ids"][0, :12]}')
         print(f'Input Mask : {text_preprocessed["input_mask"][0, :12]}')
         print(f'Type Ids   : {text_preprocessed["input_type_ids"][0, :12]}')
+
+        # 🌟🌟🌟BERTモデルの読み込み🌟🌟🌟
+        ## 🌟 あくまでここで読み込んでいることに注意
+        bert_model = hub.KerasLayer(tfhub_handle_encoder)
+        
+        # 🌟🌟使ってみる
+        # プリプロセスモデルの出力結果を渡していることに注意
+        bert_results = bert_model(text_preprocessed)
+
+        print(f'Loaded BERT: {tfhub_handle_encoder}')
+        print(f'Pooled Outputs Shape:{bert_results["pooled_output"].shape}')
+        print(f'Pooled Outputs Values:{bert_results["pooled_output"][0, :12]}')
+        print(f'Sequence Outputs Shape:{bert_results["sequence_output"].shape}')
+        print(f'Sequence Outputs Values:{bert_results["sequence_output"][0, :12]}')
         ```
 
