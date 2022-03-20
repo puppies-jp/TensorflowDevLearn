@@ -12,6 +12,11 @@ pip install -q -U keras-tuner
 
 # Required to save models in HDF5 format
 pip install pyyaml h5py  
+
+pip install -q -U "tensorflow-text==2.8.*"
+
+# AdamW optimizer
+pip install -q tf-models-official==2.7.0
 ```
 
 ```python
