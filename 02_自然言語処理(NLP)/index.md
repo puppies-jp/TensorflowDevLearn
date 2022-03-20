@@ -278,7 +278,7 @@ model = tf.keras.Sequential([
 
         <details><summary>BERTモデル群(これらから重みを選べる)</summary><div>
 
-        ```
+        <pre><code>
         bert_model_name = 'small_bert/bert_en_uncased_L-4_H-512_A-8' 
 
         map_name_to_handle = {
@@ -424,8 +424,7 @@ model = tf.keras.Sequential([
 
         print(f'BERT model selected           : {tfhub_handle_encoder}')
         print(f'Preprocess model auto-selected: {tfhub_handle_preprocess}')
-
-        ``` 
+        </code></pre>
 
         </div></details>
 
