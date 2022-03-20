@@ -18,6 +18,7 @@
 - [フォルダ構成ごとにまとまったデータセット](#DirDataset)
 - [モデル作成(基本的)](#basic_model)
 - [RNN適用モデル](#rnn_model)
+- [BERTモデル](#BERT_model)
 
 ---
 
@@ -224,8 +225,45 @@ examples = [
 ]
 
 export_model.predict(examples)
-
 ```
 
 ## <a name=rnn_model>RNNを適用したモデル</a>
+
+- RNN層1つだけのモデル
+
+```python
+model = tf.keras.Sequential([
+    encoder,
+    tf.keras.layers.Embedding(
+        input_dim=len(encoder.get_vocabulary()),
+        output_dim=64,
+        # Use masking to handle the variable sequence lengths
+        mask_zero=True),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1)
+])
+```
+
+- RNNを2層スタックしたモデル
+  - 🌟`return_sequences`の使い方に注目
+    - true: 毎回入力ごとにreturnする
+    - false: 最後に出力する。
+
+```python
+model = tf.keras.Sequential([
+    encoder,
+    tf.keras.layers.Embedding(len(encoder.get_vocabulary()), 64, mask_zero=True),
+    # 🌟return_sequences=trueとすることで毎回returnするようになっている。
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(1)
+])
+```
+
+## <a name=BERT_model>BERTを使用したモデル</a>
+
+- そもそもBERTとは、、、
 
