@@ -276,7 +276,7 @@ model = tf.keras.Sequential([
   - BERTモデルの読み込み
     - tfhubから読み込みます。
 
-        <details><summary>BERTモデル群(これらから重みを選べる)</summary><div>
+        <details><summary>(▶︎click it)BERTモデル群(これらから重みを選べる)</summary><div>
 
         <pre><code>
         bert_model_name = 'small_bert/bert_en_uncased_L-4_H-512_A-8' 
