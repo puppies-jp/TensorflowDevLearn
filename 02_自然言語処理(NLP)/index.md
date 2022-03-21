@@ -8,7 +8,8 @@
 - [x] 二項分類または多項分類のいずれかのモデルで、LSTM を使用してテキストを分類する。
 - [x] モデルに RNN 層と GRU 層を追加する。
 - [x] テキストを処理するモデルで、RNN、GRU、CNN を使用する。
-- [x] LSTM を既存のテキストで訓練して、テキストを生成する(歌や詩など)
+- [ ] LSTM を既存のテキストで訓練して、テキストを生成する(歌や詩など)
+  - [テキスト生成](text_generation)
   - [ここを参照](https://www.tensorflow.org/text/tutorials/text_generation)
 
 ---
