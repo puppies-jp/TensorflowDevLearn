@@ -5,7 +5,7 @@
 - [x] 二項分類を使用してテキストのカテゴリを特定するモデルを構築する
 - [ ] 多項分類を使用してテキストのカテゴリを特定するモデルを構築する
 - [x] TensorFlow モデルで単語埋め込みを使用する。
-- [ ] 二項分類または多項分類のいずれかのモデルで、LSTM を使用してテキストを分類する。
+- [x] 二項分類または多項分類のいずれかのモデルで、LSTM を使用してテキストを分類する。
 - [ ] モデルに RNN 層と GRU 層を追加する。
 - [ ] テキストを処理するモデルで、RNN、GRU、CNN を使用する。
 - [ ] LSTM を既存のテキストで訓練して、テキストを生成する(歌や詩など)
@@ -18,6 +18,7 @@
 - [フォルダ構成ごとにまとまったデータセット](#DirDataset)
 - [モデル作成(基本的)](#basic_model)
 - [RNN適用モデル](#rnn_model)
+  - [GRU層](#GRU_Layer)
 - [BERTモデル](#BERT_model)
 
 ---
@@ -52,7 +53,7 @@
                     )
             ```
 
-        2. 🌟(ここ覚えとくこと！！)textから変換する方法 
+        2. 🌟(ここ覚えとくこと！！)textから変換する方法
 
             ```python
             def custom_standardization(input_data):
@@ -263,6 +264,30 @@ model = tf.keras.Sequential([
 ])
 ```
 
+### <a name=GRU_Layer>GRU層</a>
+
+- GRU層とはLSTMの高い計算負荷を改善するために作られたもの
+  - [GRU層(公式：Tensorflow)](https://www.tensorflow.org/api_docs/python/tf/keras/layers/GRU)
+
+```python
+# 🌟 こんな感じで使う
+# The GRU RNN layer processes those vectors sequentially.
+tf.keras.layers.GRU(
+    self.enc_units, # 🌟 ここにはunit(Positive integer, dimensionality of the output space. ) つまり出力の形式をかく
+    return_sequences=True, # シーケンス毎に出力する(True) or 最後の1つだけ出力する(False)。(Default:False)
+
+    # 以下
+    # Return the sequence and state
+    # return_sequencesのtrue/falseとは別に戻り値に最終の状態をつけて返すか(Default:False)
+    return_state=True, #(ここがtrueだと 戻り値が (戻り値、最終の状態) で返される)
+    recurrent_initializer='glorot_uniform'
+    )
+```
+
+🌟こんな感じ!!
+![GRU_OUTPUT](GRU_output.png)
+
+
 ## <a name=BERT_model>BERTを使用したモデル</a>
 
 - そもそもBERTとは、、、
@@ -433,6 +458,12 @@ model = tf.keras.Sequential([
         ```python
         tfhub_handle_encoder = "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-4_H-512_A-8/1"
         tfhub_handle_preprocess = "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3"
+        ```
+
+      - プリプロセスモデル読み込み
+
+        ```python
+        tfhub_handle_preprocess = "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3"
 
         # 🌟🌟🌟　モデルの読み込み　🌟🌟🌟 
         ## 🌟プリプロセスモデル(あくまでpreprocessモデル)
@@ -447,7 +478,12 @@ model = tf.keras.Sequential([
         print(f'Word Ids   : {text_preprocessed["input_word_ids"][0, :12]}')
         print(f'Input Mask : {text_preprocessed["input_mask"][0, :12]}')
         print(f'Type Ids   : {text_preprocessed["input_type_ids"][0, :12]}')
+        ```
 
+        - BERTモデルの読み込み
+
+        ```python
+        tfhub_handle_encoder = "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-4_H-512_A-8/1"
         # 🌟🌟🌟BERTモデルの読み込み🌟🌟🌟
         ## 🌟 あくまでここで読み込んでいることに注意
         bert_model = hub.KerasLayer(tfhub_handle_encoder)
@@ -463,3 +499,30 @@ model = tf.keras.Sequential([
         print(f'Sequence Outputs Values:{bert_results["sequence_output"][0, :12]}')
         ```
 
+- 以上より、BERTを含むモデルを作成する。
+  - BERT層とDense層のシンプルモデルを仮定する。
+
+```python
+def build_classifier_model():
+  # 入力層
+  text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
+  
+  # 🌟 プリプロセッサ層を追加
+  preprocessing_layer = hub.KerasLayer(tfhub_handle_preprocess, name='preprocessing')
+  encoder_inputs = preprocessing_layer(text_input)
+
+  # 🌟 BERTモデル層を追加
+  encoder = hub.KerasLayer(tfhub_handle_encoder, trainable=True, name='BERT_encoder')
+  outputs = encoder(encoder_inputs)
+  # 🌟 出力の中でも"pooled_output"を使っていることに注意
+  net = outputs['pooled_output']
+
+  # Dense層追加
+  net = tf.keras.layers.Dropout(0.1)(net)
+  net = tf.keras.layers.Dense(1, activation=None, name='classifier')(net)
+  return tf.keras.Model(text_input, net)
+
+classifier_model = build_classifier_model()
+bert_raw_result = classifier_model(tf.constant(text_test))
+print(tf.sigmoid(bert_raw_result))
+```
