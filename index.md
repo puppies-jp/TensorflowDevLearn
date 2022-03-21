@@ -30,6 +30,7 @@ AUTOTUNE = tf.data.AUTOTUNE
   - [転移学習,FineTune,Hyperparameter Tune](00_モデルの構築と訓練/FineTune)
   - [不均衡なデータの検証](imbalanced)
   - [モデルの保存/読み込み](#save_load)
+  - [GPU使い方まとめ](GPU)
 
 ## [00_TensorFlow デベロッパースキル](00_デベロッパースキル)
 
