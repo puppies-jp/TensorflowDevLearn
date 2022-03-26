@@ -1,5 +1,21 @@
 # GPU周り使い方
 
+```sh
+pip install -q tensorflow-gpu==2.0.0-rc1
+```
+
+```python
+import tensorflow as tf
+
+x = tf.random.uniform([3, 3])
+
+print("利用できるGPUはあるか: "),
+print(tf.config.experimental.list_physical_devices("GPU"))
+
+print("テンソルはGPU #0にあるか:  "),
+print(x.device.endswith('GPU:0'))
+```
+
 ```python
 import time
 
