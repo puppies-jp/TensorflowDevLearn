@@ -17,6 +17,9 @@ pip install -q -U "tensorflow-text==2.8.*"
 
 # AdamW optimizer
 pip install -q tf-models-official==2.7.0
+
+# モデル画像生成用(🚨環境によっては動かない)
+pip install pydot
 ```
 
 ```python
