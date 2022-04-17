@@ -111,3 +111,9 @@ for data in train_dataset.shuffle(10).take(2):
 ```
 
 ![出力結果](coco_annotation.png)
+
+## 画像をパディングする
+
+- 以下のようにすることで、画像のパディングをおこなうことができる。`第2,3引数を変えることで、埋め込む位置を調整することもできる。`
+
+![padding](image_padding.png)
