@@ -37,7 +37,8 @@ from tensorflow.keras import datasets, layers, models
 model = models.Sequential()
 
 # Convレイヤー
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+model.add(layers.Conv2D(32, (3, 3), activation='relu',
+ input_shape=(28, 28, 1)))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
@@ -51,7 +52,8 @@ model.add(layers.Dense(10, activation='softmax'))
 # --------------------------- #
 # 🌟🌟 モデルの定義2(一括で定義する方法)
 model = Sequential([
-    Conv2D(16, 3, padding='same', activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH ,3)),
+    Conv2D(16, 3, padding='same', activation='relu', 
+    input_shape=(IMG_HEIGHT, IMG_WIDTH ,3)),
     MaxPooling2D(),
     Conv2D(32, 3, padding='same', activation='relu'),
     MaxPooling2D(),
@@ -103,7 +105,8 @@ num = 10
 res = model.predict(test_images[:num])
 
 for i in range(len(res)):
-    print(res[i].argmax() , " == " , test_labels[i]," : ",res[i].argmax() == test_labels[i])
+    print(res[i].argmax() , " == " , test_labels[i],
+    " : ",res[i].argmax() == test_labels[i])
 ```
 
 ## <a name="2">tutorial2</a>
