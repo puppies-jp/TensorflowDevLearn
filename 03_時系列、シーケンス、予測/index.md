@@ -45,7 +45,7 @@ linear = tf.keras.Sequential([
 - 1 データに対して次の時間の期待値を出力するモデル。
 - 前後関係に影響なく 1 データから出力される。
 
-![線形モデル](last_window.png)
+![線形モデル](img/last_window.png)
 
 - 線形モデルの`利点の1つ`は、`解釈が比較的簡単`なことです。レイヤーの重みを引き出して、各入力に割り当てられた重みを視覚化できます。
 
@@ -57,7 +57,7 @@ axis.set_xticks(range(len(train_df.columns)))
 _ = axis.set_xticklabels(train_df.columns, rotation=90)
 ```
 
-![線形モデル重み表示](liner_model_weight.png)
+![線形モデル重み表示](img/liner_model_weight.png)
 
 ### <a name=dense>Multi-step dense モデル</a>
 
@@ -78,7 +78,7 @@ multi_step_dense = tf.keras.Sequential([
 ])
 ```
 
-![マルチステップモデル](conv_window.png)
+![マルチステップモデル](img/conv_window.png)
 
 ### <a name=CNN>畳み込みニューラルネットワークモデル</a>
 
@@ -97,7 +97,7 @@ conv_model = tf.keras.Sequential([
 ])
 ```
 
-![Convolution neural network](wide_conv_window.png)
+![Convolution neural network](img/wide_conv_window.png)
 
 ### <a name=RNN>リカレントニューラルネットワーク</a>
 
@@ -110,7 +110,7 @@ conv_model = tf.keras.Sequential([
     - `LSTM return_sequences= false`の場合
       - レイヤーは最後のタイムステップの出力のみを返し、`単一の予測を行う前にモデルに内部状態をウォームアップする`時間を与えます
 
-    ![LSTM return_sequences= false](lstm_1_window.png)
+    ![LSTM return_sequences= false](img/lstm_1_window.png)
 
     - `LSTM return_sequences= true`の場合
       - レイヤーは入力ごとに出力を返します。
@@ -118,8 +118,7 @@ conv_model = tf.keras.Sequential([
           - RNNレイヤーのスタッキング。
           - 複数のタイムステップで同時にモデルをトレーニングします
 
-    ![LSTM return_sequences= true](lstm_many_window.png)
-
+    ![LSTM return_sequences= true](img/lstm_many_window.png)
 
 ```python
 lstm_model = tf.keras.models.Sequential([
